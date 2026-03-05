@@ -6,7 +6,7 @@
 
     <groupId>com.github.qishenghe</groupId>
     <artifactId>chat-j8</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
 
     <name>chat-j8</name>
     <description>chat-8j</description>
@@ -16,6 +16,7 @@
         <java.version>1.8</java.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -42,9 +43,9 @@
 
     <!-- scm -->
     <scm>
-        <connection>scm:git:https://github.com/qishenghe</connection>
-        <developerConnection>scm:git:https://github.com/qishenghe</developerConnection>
-        <url>git:https://github.com/qishenghe</url>
+        <connection>scm:git:https://github.com/qishenghe/chat-j8</connection>
+        <developerConnection>scm:git:https://github.com/qishenghe/chat-j8</developerConnection>
+        <url>git:https://github.com/qishenghe/chat-j8</url>
     </scm>
 
     <!-- developers -->
@@ -60,9 +61,9 @@
             <id>release</id>
             <activation>
                 <property>
-                    <name>performRelease</name>  <!-- 或你原来激活方式 -->
+                    <name>performRelease</name>
                 </property>
-            </activation>  <!-- 如果你原来没 activation，可加或不加 -->
+            </activation>
 
             <build>
                 <resources>
@@ -74,11 +75,11 @@
                     </resource>
                 </resources>
                 <plugins>
-                    <!-- Source - 建议升级到较新版，兼容 JDK 8 -->
+                    <!-- Source -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.0</version>  <!-- 原 2.2.1 太老，可升级 -->
+                        <version>3.3.0</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -89,18 +90,18 @@
                         </executions>
                     </plugin>
 
-                    <!-- Javadoc - 升级到支持更好 lint 的版 -->
+                    <!-- Javadoc -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9.1</version>  <!-- 原 2.9.1 旧，建议升级；-Xdoclint:none 可保留临时 -->
+                        <version>2.9.1</version>
                         <configuration>
                             <show>private</show>
                             <nohelp>true</nohelp>
                             <charset>UTF-8</charset>
                             <encoding>UTF-8</encoding>
                             <docencoding>UTF-8</docencoding>
-                            <additionalparam>-Xdoclint:none</additionalparam> <!-- 后面规范化后去掉 -->
+                            <additionalparam>-Xdoclint:none</additionalparam>
                         </configuration>
                         <executions>
                             <execution>
@@ -112,11 +113,11 @@
                         </executions>
                     </plugin>
 
-                    <!-- GPG - 升级到新版，支持更好配置 -->
+                    <!-- GPG -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.4</version>  <!-- 原 1.5 旧 -->
+                        <version>3.2.4</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
@@ -127,11 +128,11 @@
                         </executions>
                     </plugin>
 
-                    <!-- Compiler - 升级到稳定版 -->
+                    <!-- Compiler -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.13.0</version>  <!-- 原 3.0 旧 -->
+                        <version>3.13.0</version>
                         <configuration>
                             <source>1.8</source>
                             <target>1.8</target>
@@ -142,14 +143,14 @@
                         </configuration>
                     </plugin>
 
-                    <!-- Release - 可保留或升级 -->
+                    <!-- Release -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-release-plugin</artifactId>
-                        <version>3.1.1</version>  <!-- 原 2.5.1 旧，建议升级 -->
+                        <version>3.1.1</version>
                     </plugin>
 
-                    <!-- Jar - OK -->
+                    <!-- Jar -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
@@ -162,26 +163,24 @@
                         </configuration>
                     </plugin>
 
-                    <!-- Central Publishing - 核心改这里！ -->
+                    <!-- Central Publishing -->
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.9.0</version>  <!-- 改成 0.9.0 更稳；若想试 0.10.0 先清理缓存 -->
+                        <version>0.9.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
-                            <autoPublish>true</autoPublish>     <!-- 自动发布 -->
-                            <waitUntil>published</waitUntil>    <!-- 等到 published 结束 build -->
+                            <!-- 自动发布 -->
+                            <autoPublish>false</autoPublish>
+                            <!-- 等到 published 结束 build -->
+<!--                            <waitUntil>published</waitUntil>-->
                             <!-- 可选：如果想临时禁用上传测试 <skipPublishing>true</skipPublishing> -->
                         </configuration>
                     </plugin>
 
                 </plugins>
             </build>
-
-            <!-- 完全删除这个 distributionManagement！新方式不需它 -->
-            <!-- <distributionManagement> ... </distributionManagement> -->
-
         </profile>
     </profiles>
 
