@@ -9,13 +9,15 @@
     <version>1.0.1-SNAPSHOT</version>
 
     <name>chat-j8</name>
-    <description></description>
-    <url></url>
+    <description>chat-8j</description>
+    <url>https://github.com/qishenghe/chat-j8</url>
 
     <properties>
         <java.version>1.8</java.version>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <dependencies>
@@ -173,6 +175,7 @@
                             <!-- 可选：如果想临时禁用上传测试 <skipPublishing>true</skipPublishing> -->
                         </configuration>
                     </plugin>
+
                 </plugins>
             </build>
 
