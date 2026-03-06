@@ -7,9 +7,12 @@ import com.qishenghe.chatj8.client.entity.ChatParam;
 import com.qishenghe.chatj8.client.entity.ChatResult;
 import com.qishenghe.chatj8.enun.ChatRoleEnum;
 import lombok.Data;
+import okhttp3.sse.EventSource;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * chat-j8
@@ -131,14 +134,69 @@ public class ChatRequestSpec {
 
     /**
      * stream
+     * （non blocking）
      *
      * @param listener listener
      * @author qishenghe
      * @date 2026/3/6 18:12
      */
     public void stream (ChatListener<ChatResult> listener) {
+        // non blocking default
+        stream(listener, false);
+    }
 
-        chatClient.completions(chatParam, listener);
+    /**
+     * stream
+     *
+     * @param listener listener
+     * @param block block
+     * @author qishenghe
+     * @date 2026/3/6 18:12
+     */
+    public void stream (ChatListener<ChatResult> listener, boolean block) {
+
+        if (!block) {
+            chatClient.completions(chatParam, listener);
+        } else {
+            CountDownLatch countDownLatch = new CountDownLatch(1);
+
+            ChatListener<ChatResult> wrappedListener = new ChatListener<ChatResult>() {
+                @Override
+                public void msg(EventSource eventSource, String id, String type, ChatResult data) {
+                    listener.msg(eventSource, id, type, data);
+                }
+
+                @Override
+                public void onClosed(@NotNull EventSource eventSource) {
+                    try {
+                        listener.onClosed(eventSource);
+                    } finally {
+                        countDownLatch.countDown();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull EventSource eventSource, Throwable t, okhttp3.Response response) {
+                    try {
+                        listener.onFailure(eventSource, t, response);
+                    } finally {
+                        countDownLatch.countDown();
+                    }
+                }
+            };
+
+            // 复制 listener 的 safeWord 到包装的 listener（processor 会在 chatClient.completions 中设置）
+            wrappedListener.setSafeWord(listener.getSafeWord());
+
+            chatClient.completions(chatParam, wrappedListener);
+
+            try {
+                countDownLatch.await();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

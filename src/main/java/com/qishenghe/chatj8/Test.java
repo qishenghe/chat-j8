@@ -36,29 +36,20 @@ public class Test {
 
         System.out.println(content);
 
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-
         // stream
+
+        ChatListener<ChatResult> listener = new ChatListener<ChatResult>() {
+            @Override
+            public void msg(EventSource eventSource, String id, String type, ChatResult data) {
+                System.out.println(data.getChoices().get(0).getDelta().getContent());
+            }
+        };
+
         client.prompt()
                 .user("hello")
-                .stream(new ChatListener<ChatResult>() {
-                    @Override
-                    public void msg(EventSource eventSource, String id, String type, ChatResult data) {
-                        System.out.println(data.getChoices().get(0).getDelta().getContent());
-                    }
+                .stream(listener, true);
 
-                    @Override
-                    public void onClosed(@NotNull EventSource eventSource) {
-                        super.onClosed(eventSource);
-                        countDownLatch.countDown();
-                    }
-                });
-
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        System.out.println();
 
     }
 
