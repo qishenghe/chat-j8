@@ -6,10 +6,16 @@ import com.qishenghe.chatj8.api.ChatApiUtil;
 import com.qishenghe.chatj8.api.entity.Message;
 import com.qishenghe.chatj8.api.request.CompletionsRequest;
 import com.qishenghe.chatj8.api.response.CompletionsResponse;
+import com.qishenghe.chatj8.api.sse.DecoratorListener;
 import com.qishenghe.chatj8.enun.ChatRoleEnum;
+import okhttp3.Response;
+import okhttp3.sse.EventSource;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * chat-j8
@@ -38,7 +44,34 @@ public class Test {
 
         request.setMessages(messages);
 
-        CompletionsResponse completions = util.completions(request);
+//        CompletionsResponse completions = util.completions(request);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        util.completions(request, new DecoratorListener<CompletionsResponse>() {
+            @Override
+            public void msg(EventSource eventSource, String id, String type, CompletionsResponse data) {
+                System.out.println(data);
+            }
+
+            @Override
+            public void onClosed(@NotNull EventSource eventSource) {
+                super.onClosed(eventSource);
+                latch.countDown();
+            }
+
+            @Override
+            public void onFailure(@NotNull EventSource eventSource, @Nullable Throwable t, @Nullable Response response) {
+                super.onFailure(eventSource, t, response);
+                latch.countDown();
+            }
+        });
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         System.out.println();
     }

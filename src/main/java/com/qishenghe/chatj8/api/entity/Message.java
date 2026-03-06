@@ -38,7 +38,7 @@ public class Message implements Serializable {
      */
     private List<ToolCall> tool_calls;
 
-    public void setContent(String content) {
+    /*public void setContent(String content) {
         this.content = content;
     }
 
@@ -52,5 +52,5 @@ public class Message implements Serializable {
 
     public void setContent(Object content) {
         this.content = content;
-    }
+    }*/
 }

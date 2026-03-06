@@ -1,17 +1,25 @@
 package com.qishenghe.chatj8.api;
 
 import cn.hutool.http.ContentType;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.qishenghe.chatj8.api.request.CompletionsRequest;
 import com.qishenghe.chatj8.api.response.CompletionsResponse;
+import com.qishenghe.chatj8.api.sse.DecoratorListener;
+import com.qishenghe.chatj8.api.sse.pro.EventSourceProcessor;
 import lombok.Data;
+import okhttp3.*;
+import okhttp3.sse.EventSource;
+import okhttp3.sse.EventSourceListener;
+import okhttp3.sse.EventSources;
 
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * chat-j8
@@ -60,14 +68,84 @@ public class ChatApiUtil {
 
         String jsonString = JSON.toJSONString(request);
 
-        String response = HttpUtil.createPost(baseUrl + apiPath)
+        String response;
+
+        try (HttpResponse httpResponse = HttpUtil.createPost(baseUrl + apiPath)
                 .disableCookie()
                 .addHeaders(headers())
                 .body(jsonString, ContentType.JSON.getValue())
-                .execute()
-                .body();
+                .execute()) {
+            response = httpResponse.body();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         return processResult(response, new TypeReference<CompletionsResponse>(){});
+    }
+
+    /**
+     * completions
+     *
+     * @param request request
+     * @param listener listener
+     * @author qishenghe
+     * @date 2026/3/6 11:44
+     */
+    public void completions (CompletionsRequest request, DecoratorListener<CompletionsResponse> listener) {
+
+        listener.setProcessor(new EventSourceProcessor<CompletionsResponse>() {
+            @Override
+            public CompletionsResponse process(String data) {
+                return processResult(data, new TypeReference<CompletionsResponse>() {});
+            }
+        });
+
+        completionsStream(request, listener);
+    }
+
+    /**
+     * completions stream
+     *
+     * @param request request
+     * @param listener listener
+     * @author qishenghe
+     * @date 2026/3/6 11:30
+     */
+    private void completionsStream (CompletionsRequest request, EventSourceListener listener) {
+        String jsonString = JSON.toJSONString(request);
+
+        JSONObject jsonObject = JSONObject.parseObject(jsonString);
+
+        // 设置为流式返回
+        jsonObject.put("stream", true);
+
+        jsonString = jsonObject.toJSONString();
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
+
+        // 创建JSON数据的RequestBody
+        RequestBody body = RequestBody.create(
+                jsonString,
+                MediaType.parse("application/json; charset=utf-8")
+        );
+
+        Map<String, String> headers = headers();
+        headers.put("accept", "application/json, text/event-stream");
+
+        Request sseRequest = new Request.Builder()
+                .url(baseUrl + apiPath)
+                .headers(Headers.of(headers))
+                .post(body)
+                .build();
+
+        EventSource.Factory factory = EventSources.createFactory(client);
+
+        // 创建一个新的事件源，开始监听SSE流
+        factory.newEventSource(sseRequest, listener);
     }
 
     /**
