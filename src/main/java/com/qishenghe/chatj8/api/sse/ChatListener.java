@@ -3,7 +3,6 @@ package com.qishenghe.chatj8.api.sse;
 import com.qishenghe.chatj8.api.sse.pro.EventSourceProcessor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import okhttp3.Response;
 import okhttp3.sse.EventSource;
 import okhttp3.sse.EventSourceListener;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class DecoratorListener<T> extends EventSourceListener {
+public abstract class ChatListener<T> extends EventSourceListener {
 
     /**
      * processor

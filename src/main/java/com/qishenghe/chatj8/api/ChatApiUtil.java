@@ -8,7 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.qishenghe.chatj8.api.request.CompletionsRequest;
 import com.qishenghe.chatj8.api.response.CompletionsResponse;
-import com.qishenghe.chatj8.api.sse.DecoratorListener;
+import com.qishenghe.chatj8.api.sse.ChatListener;
 import com.qishenghe.chatj8.api.sse.pro.EventSourceProcessor;
 import lombok.Data;
 import okhttp3.*;
@@ -91,7 +91,7 @@ public class ChatApiUtil {
      * @author qishenghe
      * @date 2026/3/6 11:44
      */
-    public void completions (CompletionsRequest request, DecoratorListener<CompletionsResponse> listener) {
+    public void completions (CompletionsRequest request, ChatListener<CompletionsResponse> listener) {
 
         listener.setProcessor(new EventSourceProcessor<CompletionsResponse>() {
             @Override
@@ -111,7 +111,7 @@ public class ChatApiUtil {
      * @author qishenghe
      * @date 2026/3/6 11:30
      */
-    private void completionsStream (CompletionsRequest request, EventSourceListener listener) {
+    public void completionsStream (CompletionsRequest request, EventSourceListener listener) {
         String jsonString = JSON.toJSONString(request);
 
         JSONObject jsonObject = JSONObject.parseObject(jsonString);

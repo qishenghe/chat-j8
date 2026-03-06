@@ -1,19 +1,13 @@
 package com.qishenghe.chatj8;
 
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.qishenghe.chatj8.api.ChatApiUtil;
-import com.qishenghe.chatj8.api.entity.Message;
-import com.qishenghe.chatj8.api.request.CompletionsRequest;
-import com.qishenghe.chatj8.api.response.CompletionsResponse;
-import com.qishenghe.chatj8.api.sse.DecoratorListener;
-import com.qishenghe.chatj8.enun.ChatRoleEnum;
-import okhttp3.Response;
+import com.qishenghe.chatj8.api.sse.ChatListener;
+import com.qishenghe.chatj8.client.ChatClient;
+import com.qishenghe.chatj8.client.entity.ChatMessage;
+import com.qishenghe.chatj8.client.entity.ChatParam;
+import com.qishenghe.chatj8.client.entity.ChatResult;
 import okhttp3.sse.EventSource;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -29,46 +23,37 @@ public class Test {
         String baseUrl = "http://192.168.205.143:7000";
         String model = "Qwen/Qwen3.5-35B-A3B";
 
-        ChatApiUtil util = new ChatApiUtil();
+        ChatClient build = ChatClient.builder()
+                .baseUrl(baseUrl)
+                .model(model)
+                .build();
 
-        util.setBaseUrl(baseUrl);
+        List<ChatMessage> chatMessages = ChatMessage.builder()
+                .user("你好")
+                .build();
 
-        CompletionsRequest request = new CompletionsRequest();
-        request.setModel(model);
+        ChatParam chatParam = new ChatParam();
+        chatParam.setMessages(chatMessages);
 
-        List<Message> messages = new ArrayList<Message>();
-        Message message = new Message();
-        message.setRole(ChatRoleEnum.USER.getCode());
-        message.setContent("你好");
-        messages.add(message);
+        ChatResult completions = build.completions(chatParam);
 
-        request.setMessages(messages);
+        CountDownLatch countDownLatch = new CountDownLatch(1);
 
-//        CompletionsResponse completions = util.completions(request);
-
-        CountDownLatch latch = new CountDownLatch(1);
-
-        util.completions(request, new DecoratorListener<CompletionsResponse>() {
+        build.completions(chatParam, new ChatListener<ChatResult>() {
             @Override
-            public void msg(EventSource eventSource, String id, String type, CompletionsResponse data) {
-                System.out.println(data);
+            public void msg(EventSource eventSource, String id, String type, ChatResult data) {
+                System.out.println(data.getChoices().get(0).getDelta().getContent());
             }
 
             @Override
             public void onClosed(@NotNull EventSource eventSource) {
                 super.onClosed(eventSource);
-                latch.countDown();
-            }
-
-            @Override
-            public void onFailure(@NotNull EventSource eventSource, @Nullable Throwable t, @Nullable Response response) {
-                super.onFailure(eventSource, t, response);
-                latch.countDown();
+                countDownLatch.countDown();
             }
         });
 
         try {
-            latch.await();
+            countDownLatch.await();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
