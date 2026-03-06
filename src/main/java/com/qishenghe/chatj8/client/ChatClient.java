@@ -9,6 +9,8 @@ import com.qishenghe.chatj8.api.response.CompletionsResponse;
 import com.qishenghe.chatj8.api.sse.ChatListener;
 import com.qishenghe.chatj8.api.sse.pro.EventSourceProcessor;
 import com.qishenghe.chatj8.client.entity.*;
+import com.qishenghe.chatj8.client.entity.spec.ChatRequestSpec;
+import com.qishenghe.chatj8.enun.ChatRoleEnum;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -188,6 +190,69 @@ public class ChatClient {
             }
 
             result.setChoices(choices);
+        }
+
+        return result;
+    }
+
+    /**
+     * prompt
+     *
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 16:36
+     */
+    public ChatRequestSpec prompt () {
+
+        ChatRequestSpec result = new ChatRequestSpec();
+        result.setChatClient(this);
+
+        ChatParam chatParam = new ChatParam();
+        chatParam.setMessages(new ArrayList<>());
+        chatParam.setTools(new ArrayList<>());
+
+        result.setChatParam(chatParam);
+
+        return result;
+    }
+
+    /**
+     * prompt
+     *
+     * @param content content
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 18:24
+     */
+    public ChatRequestSpec prompt (String content) {
+
+        ChatRequestSpec result = prompt();
+
+        if (content != null) {
+            ChatMessage sys = new ChatMessage();
+            sys.setContent(content);
+            sys.setRole(ChatRoleEnum.SYSTEM.getCode());
+
+            result.getChatParam().getMessages().add(sys);
+        }
+
+        return result;
+    }
+
+    /**
+     * prompt
+     *
+     * @param context context
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 18:22
+     */
+    public ChatRequestSpec prompt (List<ChatMessage> context) {
+
+        ChatRequestSpec result = prompt();
+
+        if (context != null && !context.isEmpty()) {
+            result.getChatParam().getMessages().addAll(context);
         }
 
         return result;

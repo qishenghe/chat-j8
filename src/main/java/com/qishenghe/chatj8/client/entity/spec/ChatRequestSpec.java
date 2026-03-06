@@ -1,0 +1,144 @@
+package com.qishenghe.chatj8.client.entity.spec;
+
+import com.qishenghe.chatj8.api.sse.ChatListener;
+import com.qishenghe.chatj8.client.ChatClient;
+import com.qishenghe.chatj8.client.entity.ChatMessage;
+import com.qishenghe.chatj8.client.entity.ChatParam;
+import com.qishenghe.chatj8.client.entity.ChatResult;
+import com.qishenghe.chatj8.enun.ChatRoleEnum;
+import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * chat-j8
+ *
+ * @author qishenghe
+ * @date 2026/3/6 16:14
+ * @since 2026/3/6 16:14 by qishenghe for init
+ */
+@Data
+public class ChatRequestSpec {
+
+    /**
+     * client
+     */
+    private ChatClient chatClient;
+
+    /**
+     * chat param
+     */
+    private ChatParam chatParam;
+
+    /**
+     * add
+     *
+     * @param role role
+     * @param content content
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 17:58
+     */
+    public ChatRequestSpec add (String role, Object content) {
+
+        if (chatParam.getMessages() == null) {
+            chatParam.setMessages(new ArrayList<>());
+        }
+
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setRole(role);
+        chatMessage.setContent(content);
+
+        chatParam.getMessages().add(chatMessage);
+
+        return this;
+    }
+
+    /**
+     * add all
+     *
+     * @param messages messages
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 18:01
+     */
+    public ChatRequestSpec addAll (List<ChatMessage> messages) {
+
+        if (messages != null) {
+            chatParam.getMessages().addAll(messages);
+        }
+
+        return this;
+    }
+
+    /**
+     * think able
+     *
+     * @param think think
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 18:02
+     */
+    public ChatRequestSpec thinkAble (boolean think) {
+
+        chatParam.setThinkAble(think);
+
+        return this;
+    }
+
+    /**
+     * system
+     *
+     * @param content content
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 17:56
+     */
+    public ChatRequestSpec system (String content) {
+
+        return add(ChatRoleEnum.SYSTEM.getCode(), content);
+    }
+
+    /**
+     * user
+     *
+     * @param content content
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 18:05
+     */
+    public ChatRequestSpec user (String content) {
+
+        return add(ChatRoleEnum.USER.getCode(), content);
+    }
+
+    /**
+     * call
+     *
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 18:07
+     */
+    public ChatResponseSpec call () {
+
+        ChatResult chatResult = chatClient.completions(chatParam);
+
+        ChatResponseSpec responseSpec = new ChatResponseSpec(chatResult);
+
+        return responseSpec;
+    }
+
+    /**
+     * stream
+     *
+     * @param listener listener
+     * @author qishenghe
+     * @date 2026/3/6 18:12
+     */
+    public void stream (ChatListener<ChatResult> listener) {
+
+        chatClient.completions(chatParam, listener);
+    }
+
+}
