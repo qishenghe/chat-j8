@@ -6,7 +6,7 @@ import com.qishenghe.chatj8.api.entity.Choice;
 import com.qishenghe.chatj8.api.entity.Message;
 import com.qishenghe.chatj8.api.request.CompletionsRequest;
 import com.qishenghe.chatj8.api.response.CompletionsResponse;
-import com.qishenghe.chatj8.api.sse.ChatListener;
+import com.qishenghe.chatj8.api.sse.listener.ChatListener;
 import com.qishenghe.chatj8.api.sse.pro.EventSourceProcessor;
 import com.qishenghe.chatj8.client.entity.*;
 import com.qishenghe.chatj8.client.entity.spec.ChatRequestSpec;

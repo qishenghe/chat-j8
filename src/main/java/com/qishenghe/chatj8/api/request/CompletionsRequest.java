@@ -1,7 +1,7 @@
 package com.qishenghe.chatj8.api.request;
 
 import com.qishenghe.chatj8.api.entity.Message;
-import com.qishenghe.chatj8.api.entity.function.Tool;
+import com.qishenghe.chatj8.api.entity.function.ToolFunction;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -32,7 +32,7 @@ public class CompletionsRequest implements Serializable {
     /**
      * tools
      */
-    private List<Tool> tools;
+    private List<ToolFunction> tools;
 
     /**
      * 温度

@@ -1,4 +1,4 @@
-package com.qishenghe.chatj8.api.sse;
+package com.qishenghe.chatj8.api.sse.listener;
 
 import com.qishenghe.chatj8.api.sse.pro.EventSourceProcessor;
 import lombok.Data;

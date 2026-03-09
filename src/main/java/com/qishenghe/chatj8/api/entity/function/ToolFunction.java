@@ -13,7 +13,7 @@ import java.io.Serializable;
  * @since 2026/3/5 19:22 by qishenghe for init
  */
 @Data
-public class Tool implements Serializable {
+public class ToolFunction implements Serializable {
 
     private static final long serialVersionUID = -6034144972324519507L;
 

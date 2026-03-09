@@ -1,6 +1,6 @@
 package com.qishenghe.chatj8.client.entity;
 
-import com.qishenghe.chatj8.api.entity.function.Tool;
+import com.qishenghe.chatj8.api.entity.function.ToolFunction;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -31,6 +31,6 @@ public class ChatParam implements Serializable {
     /**
      * tools
      */
-    private List<Tool> tools;
+    private List<ToolFunction> tools;
 
 }

@@ -1,6 +1,8 @@
 package com.qishenghe.chatj8.client.entity.spec;
 
-import com.qishenghe.chatj8.api.sse.ChatListener;
+import com.qishenghe.chatj8.api.entity.function.ToolFunction;
+import com.qishenghe.chatj8.api.sse.listener.ChatListener;
+import com.qishenghe.chatj8.api.sse.listener.ToolCallsListener;
 import com.qishenghe.chatj8.client.ChatClient;
 import com.qishenghe.chatj8.client.entity.ChatMessage;
 import com.qishenghe.chatj8.client.entity.ChatParam;
@@ -35,15 +37,20 @@ public class ChatRequestSpec {
     private ChatParam chatParam;
 
     /**
+     * tool calls listener
+     */
+    private ToolCallsListener toolCallsListener;
+
+    /**
      * add
      *
-     * @param role role
+     * @param role    role
      * @param content content
      * @return result
      * @author qishenghe
      * @date 2026/3/6 17:58
      */
-    public ChatRequestSpec add (String role, Object content) {
+    public ChatRequestSpec add(String role, Object content) {
 
         if (chatParam.getMessages() == null) {
             chatParam.setMessages(new ArrayList<>());
@@ -66,7 +73,7 @@ public class ChatRequestSpec {
      * @author qishenghe
      * @date 2026/3/6 18:01
      */
-    public ChatRequestSpec addAll (List<ChatMessage> messages) {
+    public ChatRequestSpec addAll(List<ChatMessage> messages) {
 
         if (messages != null) {
             chatParam.getMessages().addAll(messages);
@@ -83,7 +90,7 @@ public class ChatRequestSpec {
      * @author qishenghe
      * @date 2026/3/6 18:02
      */
-    public ChatRequestSpec thinkAble (boolean think) {
+    public ChatRequestSpec thinkAble(boolean think) {
 
         chatParam.setThinkAble(think);
 
@@ -98,7 +105,7 @@ public class ChatRequestSpec {
      * @author qishenghe
      * @date 2026/3/6 17:56
      */
-    public ChatRequestSpec system (String content) {
+    public ChatRequestSpec system(String content) {
 
         return add(ChatRoleEnum.SYSTEM.getCode(), content);
     }
@@ -111,9 +118,63 @@ public class ChatRequestSpec {
      * @author qishenghe
      * @date 2026/3/6 18:05
      */
-    public ChatRequestSpec user (String content) {
+    public ChatRequestSpec user(String content) {
 
         return add(ChatRoleEnum.USER.getCode(), content);
+    }
+
+    /**
+     * tools
+     *
+     * @param tool tool
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 19:00
+     */
+    public ChatRequestSpec tool(ToolFunction tool) {
+
+        if (chatParam.getTools() == null) {
+            chatParam.setTools(new ArrayList<>());
+        }
+
+        if (tool != null) {
+            chatParam.getTools().add(tool);
+        }
+
+        return this;
+    }
+
+    /**
+     * tools
+     *
+     * @param tools tools
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/6 19:00
+     */
+    public ChatRequestSpec tools(List<ToolFunction> tools) {
+
+        if (tools != null && !tools.isEmpty()) {
+
+            for (ToolFunction single : tools) {
+                ChatRequestSpec tool = tool(single);
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * tool calls listener
+     *
+     * @param toolCallsListener toolCallsListener
+     * @return result
+     * @author qishenghe
+     * @date 2026/3/7 15:46
+     */
+    public ChatRequestSpec toolCallsListener(ToolCallsListener toolCallsListener) {
+        this.toolCallsListener = toolCallsListener;
+        return this;
     }
 
     /**
@@ -123,7 +184,7 @@ public class ChatRequestSpec {
      * @author qishenghe
      * @date 2026/3/6 18:07
      */
-    public ChatResponseSpec call () {
+    public ChatResponseSpec call() {
 
         ChatResult chatResult = chatClient.completions(chatParam);
 
@@ -140,7 +201,7 @@ public class ChatRequestSpec {
      * @author qishenghe
      * @date 2026/3/6 18:12
      */
-    public void stream (ChatListener<ChatResult> listener) {
+    public void stream(ChatListener<ChatResult> listener) {
         // non blocking default
         stream(listener, false);
     }
@@ -149,11 +210,11 @@ public class ChatRequestSpec {
      * stream
      *
      * @param listener listener
-     * @param block block
+     * @param block    block
      * @author qishenghe
      * @date 2026/3/6 18:12
      */
-    public void stream (ChatListener<ChatResult> listener, boolean block) {
+    public void stream(ChatListener<ChatResult> listener, boolean block) {
 
         if (!block) {
             chatClient.completions(chatParam, listener);

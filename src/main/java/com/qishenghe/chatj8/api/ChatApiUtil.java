@@ -8,7 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.qishenghe.chatj8.api.request.CompletionsRequest;
 import com.qishenghe.chatj8.api.response.CompletionsResponse;
-import com.qishenghe.chatj8.api.sse.ChatListener;
+import com.qishenghe.chatj8.api.sse.listener.ChatListener;
 import com.qishenghe.chatj8.api.sse.pro.EventSourceProcessor;
 import lombok.Data;
 import okhttp3.*;
